@@ -1,1 +1,2 @@
-# Recortador-m-ltiple-de-im-genes
+# Recortador Multiple De Imagenes
+![Preview](previews/1.png)

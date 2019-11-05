@@ -1,0 +1,2 @@
+C:\AppServ\www
+http://localhost
