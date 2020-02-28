@@ -1,4 +1,4 @@
-package recortador;
+package utils;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,6 +23,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import periquito.MenuPrincipal;
+
 @SuppressWarnings("serial")
 public class PhotoFrame extends javax.swing.JFrame {
 
@@ -30,7 +32,12 @@ public class PhotoFrame extends javax.swing.JFrame {
 	javax.swing.JMenu jMenu1;
 	javax.swing.JMenuBar jMenuBar1;
 	javax.swing.JMenuItem jMenuItem1;
-	private javax.swing.JPanel jPanel1;
+	static javax.swing.JPanel jPanel1;
+
+	public static javax.swing.JPanel getjPanel1() {
+		return jPanel1;
+	}
+
 	javax.swing.JScrollPane jScrollPane1;
 	private JRadioButton rdbtnSingle;
 	static JRadioButton rdbtnMultipleCrop;
@@ -49,6 +56,35 @@ public class PhotoFrame extends javax.swing.JFrame {
 		AffineTransformOp ato = new AffineTransformOp(imTransform.getTransform(), AffineTransformOp.TYPE_BILINEAR);
 		destinationImage = ato.createCompatibleDestImage(origen, origen.getColorModel());
 		return ato.filter(origen, destinationImage);
+	}
+
+	public boolean redimensionarJFrame(int ancho, int alto) {
+
+		boolean resultado = false;
+
+		Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+
+		int width = pantalla.width;
+
+		ancho += 20;
+
+		alto += 113;
+
+		if (width > ancho) {
+
+			setSize(ancho, alto);
+		}
+
+		else {
+			resultado = true;
+
+		}
+
+		setLocationRelativeTo(null);
+
+		setVisible(true);
+
+		return resultado;
 	}
 
 	private static BufferedImage loadJPGImage(String ruta) throws IOException {
@@ -77,7 +113,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		this.setSize(new Dimension(656, 600));
 
-		PhotoFrame.this.setTitle("Recortador de imágenes");
+		PhotoFrame.this.setTitle("Periquito v3 - Crop");
 		PhotoFrame.this.setLocationRelativeTo(null);
 		this.jPanel1.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
 		this.jPanel1.add(photoPanel);
@@ -114,24 +150,42 @@ public class PhotoFrame extends javax.swing.JFrame {
 		jMenu1.setText("File  ");
 
 		jMenuItem1.setText("Open image...");
+
 		jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
+
 				try {
+
 					LinkedList<String> listaImagenes = new LinkedList<>();
 
-					listaImagenes = Metodos.directorio(
-							Main.getDirectorioActual() + "Config" + Main.getSeparador() + "imagenes_para_recortar",
+					listaImagenes = Metodos.directorio(MenuPrincipal.getDirectorioActual() + "Config"
+							+ MenuPrincipal.getSeparador() + "imagenes_para_recortar" + MenuPrincipal.getSeparador(),
 							".");
 
-					Metodos.renombrarArchivos(listaImagenes, Main.getDirectorioActual() + "Config" + Main.getSeparador()
-							+ "imagenes_para_recortar" + Main.getSeparador());
+					Metodos.renombrarArchivos(listaImagenes, MenuPrincipal.getDirectorioActual() + "Config"
+							+ MenuPrincipal.getSeparador() + "imagenes_para_recortar" + MenuPrincipal.getSeparador());
 
-					jMenuItem1ActionPerformed();
+					ImageIcon icono = new ImageIcon(jMenuItem1ActionPerformed());
 
-				} catch (IOException e) {
+					int ancho = icono.getIconWidth();
+
+					int alto = icono.getIconHeight();
+
+					setSize(new Dimension(ancho, alto));
+
+					if (redimensionarJFrame(ancho, alto)) {
+						setExtendedState(JFrame.MAXIMIZED_BOTH);
+					}
+
+				}
+
+				catch (Exception e) {
 					Metodos.mensaje("Error", 1);
 				}
+
 			}
+
 		});
 
 		jMenu1.add(jMenuItem1);
@@ -194,14 +248,18 @@ public class PhotoFrame extends javax.swing.JFrame {
 				try {
 
 					if (angulo >= 360) {
+
 						angulo = 90;
-					} else {
+					}
+
+					else {
 						angulo += 90;
 					}
 
 					img = loadJPGImage(fileChooser.getSelectedFile().toString());
 
 					dst = rotacionImagen(img, angulo);
+
 					photoPanel.setPhoto(dst);
 
 				} catch (Exception e1) {
@@ -246,8 +304,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				try {
-					int numeroImagenes = Metodos.listarFicherosPorCarpeta(
-							new File(Main.getDirectorioActual() + "Config/Image_rotate"), ".");
+					int numeroImagenes = Metodos.listarFicherosPorCarpeta(new File("Config/Image_rotate"), ".");
 					saveJPGImage(dst, ++numeroImagenes,
 							Metodos.extraerExtension(fileChooser.getSelectedFile().toString()));
 				} catch (Exception e1) {
@@ -260,7 +317,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				try {
-					Metodos.abrirCarpeta(Main.getDirectorioActual() + "Config" + Main.getSeparador() + "Image_rotate");
+					Metodos.abrirCarpeta("Config" + MenuPrincipal.getSeparador() + "Image_rotate");
 				} catch (IOException e1) {
 					//
 				}
@@ -273,8 +330,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				try {
-					Metodos.abrirCarpeta(
-							Main.getDirectorioActual() + "Config" + Main.getSeparador() + "imagenes_para_recortar");
+					Metodos.abrirCarpeta("Config" + MenuPrincipal.getSeparador() + "imagenes_para_recortar");
 				} catch (IOException e1) {
 					//
 				}
@@ -287,14 +343,16 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 	}
 
-	private void jMenuItem1ActionPerformed() throws IOException {
+	private String jMenuItem1ActionPerformed() throws IOException {
+
+		String imagen = "";
 
 		File miDir = new File(".");
 
 		fileChooser.setFileFilter(new FileNameExtensionFilter("Archivo de Imagen", "jpg", "png"));
 
-		fileChooser.setCurrentDirectory(new File(miDir.getCanonicalPath() + Main.getSeparador() + "Config"
-				+ Main.getSeparador() + "imagenes_para_recortar"));
+		fileChooser.setCurrentDirectory(new File(miDir.getCanonicalPath() + MenuPrincipal.getSeparador() + "Config"
+				+ MenuPrincipal.getSeparador() + "imagenes_para_recortar"));
 
 		int result = fileChooser.showOpenDialog(null);
 
@@ -302,25 +360,35 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 			try {
 
-				photoPanel.setPhoto(ImageIO.read(fileChooser.getSelectedFile()));
-			}
+				imagen = fileChooser.getSelectedFile().toString();
 
-			catch (IOException ex) {
+				photoPanel.setPhoto(ImageIO.read(fileChooser.getSelectedFile()));
+
+			} catch (IOException ex) {
 				//
 			}
+
 		}
+
+		return imagen;
 	}
 
 	public static void main(String[] args) {
 
 		try {
+
 			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+
 				if ("Nimbus".equals(info.getName())) {
 					javax.swing.UIManager.setLookAndFeel(info.getClassName());
 					break;
 				}
+
 			}
-		} catch (Exception ex) {
+
+		}
+
+		catch (Exception ex) {
 			java.util.logging.Logger.getLogger(PhotoFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
 					ex);
 		}
@@ -330,6 +398,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			public void run() {
 				new PhotoFrame().setVisible(true);
 			}
+
 		});
 	}
 }
