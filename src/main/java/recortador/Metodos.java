@@ -7,6 +7,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +26,184 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public abstract class Metodos {
+
+	public static LinkedList<String> directorio(String ruta, String extension, int filtro) {
+
+		LinkedList<String> lista = new LinkedList<>();
+
+		File f = new File(ruta);
+
+		if (f.exists()) {
+
+			lista.clear();
+
+			File[] ficheros = f.listFiles();
+
+			String fichero = "";
+
+			String extensionArchivo;
+
+			File folder;
+
+			for (int x = 0; x < ficheros.length; x++) {
+
+				fichero = ficheros[x].getName();
+
+				folder = new File(ruta + fichero);
+
+				if (filtro == 1) {
+
+					if (folder.isFile()) {
+
+						extensionArchivo = extraerExtension(fichero);
+
+						if (fichero.length() > 5 && fichero.substring(0, fichero.length() - 5).contains(".")) {
+
+							renombrar(ruta + fichero, ruta + eliminarPuntos(fichero));
+
+						}
+
+						if (extension.equals("webp") && extensionArchivo.equals("webp")
+								|| extension.equals("jpeg") && extensionArchivo.equals("jpeg") || extension.equals(".")
+								|| extension.equals(extensionArchivo)) {
+
+							lista.add(fichero);
+						}
+
+					}
+
+				}
+
+				else {
+
+					if (folder.isDirectory()) {
+						lista.add(fichero);
+					}
+
+				}
+
+			}
+
+		}
+
+		return lista;
+
+	}
+
+	public static JSONObject apiImagenes(String parametros) throws IOException {
+		JSONObject json = readJsonFromUrl("https://apiperiquito.herokuapp.com/recibo-json.php?imagenes=" + parametros);
+		return json;
+	}
+
+	public static JSONObject readJsonFromUrl(String url) throws IOException {
+
+		InputStream is = new URL(url).openStream();
+
+		BufferedReader rd = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+
+		String jsonText = readAll(rd);
+		is.close();
+
+		return new JSONObject(jsonText);
+
+	}
+
+	private static String readAll(Reader rd) throws IOException {
+
+		StringBuilder sb = new StringBuilder();
+
+		int cp;
+
+		while ((cp = rd.read()) != -1) {
+			sb.append((char) cp);
+		}
+
+		return sb.toString();
+	}
+
+	public static String obtenerParametros(List<String> list) {
+
+		StringBuilder bld = new StringBuilder();
+		String extension;
+
+		for (int i = 0; i < list.size(); i++) {
+
+			extension = list.get(i).substring(list.get(i).length() - 3, list.get(i).length());
+
+			if (list.size() == 1 || i + 1 == list.size()) {
+				bld.append(i + "." + extension);
+
+			}
+
+			else {
+
+				bld.append(i + "." + extension + ",");
+			}
+
+		}
+
+		return bld.toString();
+	}
+
+	public static void renombrarArchivos(String ruta, String filtro, boolean api) throws IOException {
+
+		List<String> list = directorio(ruta, filtro, 1);
+
+		if (list.size() > 0) {
+
+			File f1;
+
+			File f2;
+
+			File f3;
+
+			JSONArray imagenesBD = null;
+
+			if (api) {
+
+				JSONObject json;
+
+				String parametros = Metodos.obtenerParametros(list);
+
+				json = Metodos.apiImagenes(parametros);
+
+				imagenesBD = json.getJSONArray("imagenes_bd");
+			}
+
+			for (int x = 0; x < list.size(); x++) {
+
+				f1 = new File(ruta + list.get(x));
+
+				f2 = new File(ruta + Metodos.eliminarPuntos(list.get(x)));
+
+				if (f1.isFile() && f1.renameTo(f2)) {
+
+					if (api) {
+
+						f3 = new File(ruta + imagenesBD.get(x));
+
+						if (!f2.renameTo(f3)) {
+							x = list.size();
+						}
+
+					}
+
+				}
+
+				else {
+
+					x = list.size();
+
+				}
+
+			}
+		}
+	}
+
 	public static String extraerExtension(String nombreArchivo) {
 
 		String extension = "";

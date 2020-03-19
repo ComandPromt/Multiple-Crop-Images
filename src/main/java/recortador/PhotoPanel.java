@@ -194,7 +194,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 				count += numeroImagen;
 			}
 
-			if (PhotoFrame.rdbtnMultipleCrop.isSelected()) {
+			if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected()) {
 
 				vueltas = listaImagenes.size();
 			}
