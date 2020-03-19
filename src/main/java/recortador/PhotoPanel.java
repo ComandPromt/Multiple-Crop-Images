@@ -16,16 +16,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -258,68 +254,9 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 			PhotoFrame.photoPanel.photo = null;
 
-			int n = 2;
-
-			if (--y <= 170) {
-
-				n = JOptionPane.showConfirmDialog(null, "¿Quieres crear un gif con las imágenes recortadas?",
-						"Crear GIF", JOptionPane.YES_NO_OPTION);
-
-				if (n == 0) {
-
-					listaImagenes = Metodos.directorio(directorioActual + "Config" + Main.getSeparador()
-							+ "imagenes_para_recortar" + Main.getSeparador() + "recortes", ".");
-
-					for (int x = 0; x < listaImagenes.size(); x++) {
-						Files.move(
-								FileSystems.getDefault()
-										.getPath(directorioActual + "Config" + Main.getSeparador()
-												+ "imagenes_para_recortar" + Main.getSeparador() + "recortes"
-												+ Main.getSeparador() + listaImagenes.get(x)),
-								FileSystems.getDefault()
-										.getPath(Main.getLectura()[0] + Main.getSeparador() + "Hacer_gif"
-												+ Main.getSeparador() + "img" + Main.getSeparador()
-												+ listaImagenes.get(x)),
-								StandardCopyOption.REPLACE_EXISTING);
-					}
-
-					try {
-
-						int recuento = Metodos
-								.listarFicherosPorCarpeta(new File(Main.getLectura()[0] + "/Hacer_gif/img"), ".");
-
-						if (recuento <= 170) {
-							if (Main.getOs().equals("Linux")) {
-
-								Metodos.cambiarPermisos();
-
-							}
-
-							Main.hacerGIF();
-
-						} else {
-							Main.mensaje170();
-						}
-
-					} catch (Exception e1) {
-
-						try {
-							new Config().setVisible(true);
-						} catch (IOException e2) {
-							//
-						}
-
-					}
-
-				}
-
-			}
-
-			if (n > 0) {
-				Metodos.mensaje("Las imágenes han sido recortadas correctamente", 2);
-				Metodos.abrirCarpeta(
-						"Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador() + "recortes");
-			}
+			Metodos.mensaje("Las imágenes han sido recortadas correctamente", 2);
+			Metodos.abrirCarpeta(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+					+ Main.getSeparador() + "recortes");
 
 		}
 
