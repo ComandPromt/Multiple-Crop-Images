@@ -642,6 +642,21 @@ public abstract class Metodos {
 		return ocurrencias;
 	}
 
+	public static void eliminarArchivos(String ruta) {
+
+		LinkedList<String> frames = Metodos.directorio(ruta, ".", 1);
+
+		for (int i = 0; i < frames.size(); i++) {
+
+			if (!frames.get(i).isEmpty()) {
+
+				eliminarFichero(ruta + Main.getSeparador() + frames.get(i));
+			}
+
+		}
+
+	}
+
 	public static void reproducirSonido(String nombreSonido, boolean repetir) {
 
 		try {

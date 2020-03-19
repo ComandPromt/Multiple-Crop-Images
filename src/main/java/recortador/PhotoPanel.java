@@ -15,13 +15,13 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -65,24 +65,27 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		JMenuItem menuItem = new JMenuItem("Save image");
 		menuItem.addActionListener((ActionEvent e) -> {
+
 			try {
 				saveImage();
-			} catch (RasterFormatException e1) {
+			}
+
+			catch (RasterFormatException e1) {
 				Metodos.mensaje("La zona seleccionada es más grande que una o más imágenes", 1);
 				Metodos.mensaje("Se han recortado las fotos anteriores a la foto que se muestra", 3);
-			} catch (Exception e1) {
+			}
 
-				File directorio = new File(
-						"Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador() + "recortes");
+			catch (Exception e1) {
+
+				File directorio = new File(Main.getDirectorioActual() + "Config" + Main.getSeparador()
+						+ "imagenes_para_recortar" + Main.getSeparador() + "recortes");
+
 				directorio.mkdir();
-				try {
-					new Config().setVisible(true);
-				} catch (IOException e2) {
-					//
-				}
 
 			}
+
 		});
+
 		popupMenu.add(menuItem);
 
 		Timer timer = new Timer();
@@ -162,14 +165,16 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	}
 
 	@SuppressWarnings("all")
+
 	private void saveImage() throws Exception {
 
-		String directorioActual = new File(".").getCanonicalPath() + Main.getSeparador();
+		String directorioActual = Main.getDirectorioActual();
 
 		LinkedList<String> listaImagenes = new LinkedList<>();
 
-		listaImagenes = Metodos.directorio(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar",
-				".");
+		listaImagenes = Metodos.directorio(
+				directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(), ".",
+				1);
 
 		listaImagenes.sort(String::compareToIgnoreCase);
 
@@ -177,8 +182,9 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 			int vueltas = 1;
 
-			listaImagenes = Metodos
-					.directorio(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar", ".");
+			listaImagenes = Metodos.directorio(
+					directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(),
+					".", 1);
 
 			count = 1;
 
@@ -210,7 +216,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 			String numero = "";
 
 			int y = Metodos.directorio(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
-					+ Main.getSeparador() + "recortes", ".").size() + 1;
+					+ Main.getSeparador() + "recortes" + Main.getSeparador(), ".", 1).size() + 1;
 
 			for (int x = 0; x < vueltas; x++) {
 
@@ -254,6 +260,17 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 			PhotoFrame.photoPanel.photo = null;
 
+			int n = 2;
+
+			int respuesta = JOptionPane.showConfirmDialog(null, "¿Quieres borrar las imágenes para recortar?",
+					"Borrar archivos", JOptionPane.YES_NO_OPTION);
+
+			if (respuesta == 0) {
+
+				Metodos.eliminarArchivos(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+						+ Main.getSeparador());
+			}
+
 			Metodos.mensaje("Las imágenes han sido recortadas correctamente", 2);
 			Metodos.abrirCarpeta(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
 					+ Main.getSeparador() + "recortes");
@@ -262,10 +279,15 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		else {
 			Metodos.mensaje("Las imágenes deben estar en la carpeta imágenes_para_recortar", 2);
+			PhotoFrame.photoPanel.setBackground(Color.WHITE);
+			PhotoFrame.photoPanel.setForeground(Color.WHITE);
+			PhotoFrame.getjPanel1().add(PhotoFrame.photoPanel);
 		}
+
 	}
 
 	@Override
+
 	public void mouseDragged(MouseEvent e) {
 		x2 = (int) e.getPoint().getX();
 		y2 = (int) e.getPoint().getY();
