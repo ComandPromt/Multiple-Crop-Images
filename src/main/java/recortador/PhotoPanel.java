@@ -15,6 +15,10 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,7 +39,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 	private Color color1 = new Color(255, 255, 255);
 	private Color color2 = new Color(0, 0, 0);
-
+	int salto = 0;
 	transient BufferedImage tmpRecorte;
 
 	private float clipX = 0;
@@ -55,24 +59,32 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	private JPopupMenu popupMenu = new JPopupMenu();
 
 	public PhotoPanel() {
+
 		super();
 
-		PhotoPanel.this.setSize(new Dimension(0, 0));
-		PhotoPanel.this.setPreferredSize(new Dimension(0, 0));
+		setSize(new Dimension(0, 0));
 
-		PhotoPanel.this.addMouseMotionListener(PhotoPanel.this);
-		PhotoPanel.this.addMouseListener(PhotoPanel.this);
+		setPreferredSize(new Dimension(0, 0));
+
+		addMouseMotionListener(PhotoPanel.this);
+
+		addMouseListener(PhotoPanel.this);
 
 		JMenuItem menuItem = new JMenuItem("Save image");
+
 		menuItem.addActionListener((ActionEvent e) -> {
 
 			try {
+
 				saveImage();
 			}
 
 			catch (RasterFormatException e1) {
+
 				Metodos.mensaje("La zona seleccionada es más grande que una o más imágenes", 1);
+
 				Metodos.mensaje("Se han recortado las fotos anteriores a la foto que se muestra", 3);
+
 			}
 
 			catch (Exception e1) {
@@ -167,6 +179,12 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	@SuppressWarnings("all")
 
 	private void saveImage() throws Exception {
+		++salto;
+		System.out.println("salto: " + salto);
+		if (salto == 2) {
+			System.out.println("parate");
+		}
+		boolean terminado = false;
 
 		String directorioActual = Main.getDirectorioActual();
 
@@ -178,89 +196,110 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		listaImagenes.sort(String::compareToIgnoreCase);
 
-		if (!listaImagenes.isEmpty()) {
+		System.out.println("entro a recortar");
 
-			int vueltas = 1;
+		int vueltas = 1;
 
-			listaImagenes = Metodos.directorio(
-					directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(),
-					".", 1);
+		listaImagenes = Metodos.directorio(
+				directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(), ".",
+				1);
 
-			count = 1;
+		count = 1;
 
-			int numeroImagen = Metodos.listarFicherosPorCarpeta(new File(directorioActual + "Config"
-					+ Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador() + "recortes"));
+		int numeroImagen = Metodos.listarFicherosPorCarpeta(new File(directorioActual + "Config" + Main.getSeparador()
+				+ "imagenes_para_recortar" + Main.getSeparador() + "recortes"));
 
-			if (numeroImagen > 0) {
+		if (numeroImagen > 0) {
 
-				count += numeroImagen;
+			count += numeroImagen;
+		}
+
+		if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected()) {
+
+			vueltas = listaImagenes.size();
+		}
+
+		else {
+
+			String imagenSelecionada = PhotoFrame.fileChooser.getSelectedFile().toString();
+
+			imagenSelecionada = imagenSelecionada.substring(imagenSelecionada.lastIndexOf(Main.getSeparador()) + 1,
+					imagenSelecionada.length());
+
+			listaImagenes.set(0, imagenSelecionada);
+		}
+
+		String extension;
+
+		String numero = "";
+
+		int y = Metodos.directorio(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+				+ Main.getSeparador() + "recortes" + Main.getSeparador(), ".", 1).size() + 1;
+
+		for (int x = 0; x < vueltas; x++) {
+
+			extension = listaImagenes.get(x).substring(listaImagenes.get(x).length() - 3,
+					listaImagenes.get(x).length());
+
+			if (extension.equals("peg")) {
+				extension = "jpg";
 			}
 
-			if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected()) {
+			photo = ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+					+ Main.getSeparador() + listaImagenes.get(x)));
 
-				vueltas = listaImagenes.size();
+			tmpRecorte = ((BufferedImage) photo).getSubimage((int) clipX, (int) clipY, (int) clipWidth,
+					(int) clipHeight);
+
+			if (y < 10) {
+				numero = "000" + y;
 			}
 
 			else {
 
-				String imagenSelecionada = PhotoFrame.fileChooser.getSelectedFile().toString();
+				if (y >= 10 && y < 100) {
+					numero = "00" + y;
+				} else {
 
-				imagenSelecionada = imagenSelecionada.substring(imagenSelecionada.lastIndexOf(Main.getSeparador()) + 1,
-						imagenSelecionada.length());
-
-				listaImagenes.set(0, imagenSelecionada);
-			}
-
-			String extension;
-
-			String numero = "";
-
-			int y = Metodos.directorio(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
-					+ Main.getSeparador() + "recortes" + Main.getSeparador(), ".", 1).size() + 1;
-
-			for (int x = 0; x < vueltas; x++) {
-
-				extension = listaImagenes.get(x).substring(listaImagenes.get(x).length() - 3,
-						listaImagenes.get(x).length());
-
-				if (extension.equals("peg")) {
-					extension = "jpg";
-				}
-
-				photo = ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador()
-						+ "imagenes_para_recortar" + Main.getSeparador() + listaImagenes.get(x)));
-				tmpRecorte = ((BufferedImage) photo).getSubimage((int) clipX, (int) clipY, (int) clipWidth,
-						(int) clipHeight);
-
-				if (y < 10) {
-					numero = "000" + y;
-				}
-
-				else {
-
-					if (y >= 10 && y < 100) {
-						numero = "00" + y;
+					if (y >= 100 && y < 1000) {
+						numero = "0" + y;
 					} else {
-
-						if (y >= 100 && y < 1000) {
-							numero = "0" + y;
-						} else {
-							numero = "" + y;
-						}
+						numero = "" + y;
 					}
 				}
-
-				y++;
-
-				ImageIO.write(tmpRecorte, extension,
-						new File(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
-								+ Main.getSeparador() + "recortes" + Main.getSeparador() + "Image_" + numero + "."
-								+ extension));
 			}
 
-			PhotoFrame.photoPanel.photo = null;
+			y++;
 
-			int n = 2;
+			ImageIO.write(tmpRecorte, extension,
+					new File(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+							+ Main.getSeparador() + "recortes" + Main.getSeparador() + "Image_" + numero + "."
+							+ extension));
+		}
+
+		if (PhotoFrame.rdbtnmntmNewRadioItem_1.isSelected()) {
+
+			if (JOptionPane.showConfirmDialog(null, "¿Quieres recortar otra imagen?", "Recorte normal",
+					JOptionPane.YES_NO_OPTION) == 0) {
+				photo = null;
+				PhotoFrame.jMenuItem1ActionPerformed();
+			}
+
+			else {
+
+				terminado = true;
+				PhotoFrame.photoPanel.photo = null;
+			}
+		}
+
+		else {
+			terminado = true;
+			PhotoFrame.photoPanel.photo = null;
+		}
+
+		int n = 2;
+
+		if (terminado) {
 
 			int respuesta = JOptionPane.showConfirmDialog(null, "¿Quieres borrar las imágenes para recortar?",
 					"Borrar archivos", JOptionPane.YES_NO_OPTION);
@@ -271,17 +310,100 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 						+ Main.getSeparador());
 			}
 
-			Metodos.mensaje("Las imágenes han sido recortadas correctamente", 2);
-			Metodos.abrirCarpeta(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
-					+ Main.getSeparador() + "recortes");
+			--y;
 
-		}
+			if ((PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() || PhotoFrame.rdbtnmntmNewRadioItem_1.isSelected())
+					&& y > 1 && y <= 170) {
 
-		else {
-			Metodos.mensaje("Las imágenes deben estar en la carpeta imágenes_para_recortar", 2);
-			PhotoFrame.photoPanel.setBackground(Color.WHITE);
-			PhotoFrame.photoPanel.setForeground(Color.WHITE);
-			PhotoFrame.getjPanel1().add(PhotoFrame.photoPanel);
+				n = JOptionPane.showConfirmDialog(null, "¿Quieres crear un gif con las imágenes recortadas?",
+						"Crear GIF", JOptionPane.YES_NO_OPTION);
+
+				if (n == 0) {
+
+					listaImagenes = Metodos.directorio(directorioActual + "Config" + Main.getSeparador()
+							+ "imagenes_para_recortar" + Main.getSeparador() + "recortes" + Main.getSeparador(), ".",
+							1);
+
+					for (int x = 0; x < listaImagenes.size(); x++) {
+
+						Files.move(
+
+								FileSystems.getDefault()
+										.getPath(directorioActual + "Config" + Main.getSeparador()
+												+ "imagenes_para_recortar" + Main.getSeparador() + "recortes"
+												+ Main.getSeparador() + listaImagenes.get(x)),
+
+								FileSystems.getDefault()
+										.getPath(Main.getLectura()[0] + Main.getSeparador() + "Hacer_gif"
+												+ Main.getSeparador() + "img" + Main.getSeparador()
+												+ listaImagenes.get(x)),
+
+								StandardCopyOption.REPLACE_EXISTING);
+					}
+
+					try {
+
+						int recuento = Metodos
+								.listarFicherosPorCarpeta(new File(Main.getLectura()[0] + "/Hacer_gif/img"), ".");
+
+						if (recuento <= 170) {
+
+							if (Main.getOs().equals("Linux")) {
+
+								Metodos.cambiarPermisos();
+
+							}
+
+							Main.hacerGIF();
+
+						}
+
+						else {
+							Main.mensaje170();
+						}
+
+					}
+
+					catch (Exception e1) {
+
+						try {
+
+							new Config().setVisible(true);
+						}
+
+						catch (IOException e2) {
+							//
+						}
+
+					}
+
+				}
+
+				else {
+
+					Object seleccion = JOptionPane.showInputDialog(null,
+							"Seleccione opcion" + "[1] Mover para subir al CMS" + "[2] Mover para hacer GIF"
+									+ "[3] Comprobar SHA" + "",
+							"Selector de opciones", JOptionPane.QUESTION_MESSAGE, null, // null para icono defecto
+							new Object[] { "", "opcion 2", "opcion 3" }, "opcion 1");
+
+					System.out.println("El usuario ha elegido " + seleccion);
+				}
+
+				if (n > 0) {
+
+					Metodos.abrirCarpeta(directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+							+ Main.getSeparador() + "recortes");
+				}
+
+			}
+
+			else {
+
+				PhotoFrame.photoPanel.setBackground(Color.WHITE);
+				PhotoFrame.photoPanel.setForeground(Color.WHITE);
+				PhotoFrame.getjPanel1().add(PhotoFrame.photoPanel);
+			}
 		}
 
 	}

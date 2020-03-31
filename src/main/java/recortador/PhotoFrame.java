@@ -11,6 +11,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -23,17 +24,23 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-@SuppressWarnings("serial")
 public class PhotoFrame extends javax.swing.JFrame {
 
 	static JRadioButtonMenuItem rdbtnmntmNewRadioItem = new JRadioButtonMenuItem("Simple");
-
+	static int ancho;
+	static int alto = 0;
 	static JRadioButtonMenuItem rdbtnmntmNewRadioItem_2 = new JRadioButtonMenuItem("Multiple");
 	static PhotoPanel photoPanel = new PhotoPanel();
 	javax.swing.JMenu jMenu1;
 	javax.swing.JMenuBar jMenuBar1;
 	javax.swing.JMenuItem jMenuItem1;
 	static javax.swing.JPanel jPanel1;
+	static JRadioButtonMenuItem rdbtnmntmNewRadioItem_1;
+	static String imagen = "";
+
+	public static void setImagen(String imagen) {
+		PhotoFrame.imagen = imagen;
+	}
 
 	public static javax.swing.JPanel getjPanel1() {
 		return jPanel1;
@@ -55,6 +62,26 @@ public class PhotoFrame extends javax.swing.JFrame {
 		AffineTransformOp ato = new AffineTransformOp(imTransform.getTransform(), AffineTransformOp.TYPE_BILINEAR);
 		destinationImage = ato.createCompatibleDestImage(origen, origen.getColorModel());
 		return ato.filter(origen, destinationImage);
+	}
+
+	public void maximizar(String imagen) {
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
+	}
+
+	void redimensionar(String imagen) throws IOException {
+
+		if (!rdbtnmntmNewRadioItem_1.isSelected()) {
+			ImageIcon icono = new ImageIcon(imagen);
+
+			ancho = icono.getIconWidth();
+
+			alto = icono.getIconHeight();
+
+			setSize(new Dimension(ancho, alto));
+
+			redimensionarJFrame(ancho, alto);
+		}
+
 	}
 
 	public boolean redimensionarJFrame(int ancho, int alto) {
@@ -99,19 +126,46 @@ public class PhotoFrame extends javax.swing.JFrame {
 	}
 
 	private void rabioBoxPorDefecto() {
-		if (rdbtnmntmNewRadioItem_2.isSelected() && !rdbtnmntmNewRadioItem.isSelected()) {
+		if (!rdbtnmntmNewRadioItem.isSelected()) {
+
 			rdbtnmntmNewRadioItem_2.setSelected(true);
+			rdbtnmntmNewRadioItem.setSelected(false);
+
+			rdbtnmntmNewRadioItem_1.setSelected(false);
+		}
+	}
+
+	protected void siguienteImagen() {
+		try {
+
+			Metodos.renombrarArchivos(Main.getDirectorioActual() + "Config" + Main.getSeparador()
+					+ "imagenes_para_recortar" + Main.getSeparador() + "recortes" + Main.getSeparador(), ".", true);
+
+			imagen = jMenuItem1ActionPerformed();
+
+			if (!rdbtnmntmNewRadioItem_1.isSelected()) {
+				redimensionar(imagen);
+			}
+
+			else {
+
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+			}
+
+		}
+
+		catch (Exception e) {
+
+			Metodos.mensaje("Error", 1);
 		}
 	}
 
 	public PhotoFrame() {
-		setResizable(false);
 		setType(Type.POPUP);
 		photoPanel.setBackground(Color.WHITE);
 		photoPanel.setForeground(Color.WHITE);
 		setIconImage(Toolkit.getDefaultToolkit().getImage(PhotoFrame.class.getResource("/imagenes/crop.png")));
 		initComponents();
-		rdbtnmntmNewRadioItem_2.setSelected(true);
 
 		setMinimumSize(new Dimension(656, 300));
 		PhotoFrame.this.setTitle("Periquito - Crop");
@@ -125,6 +179,8 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		jScrollPane1 = new javax.swing.JScrollPane();
 		jPanel1 = new javax.swing.JPanel();
+		jPanel1.setBackground(Color.WHITE);
+		jPanel1.setForeground(Color.WHITE);
 		jMenuBar1 = new javax.swing.JMenuBar();
 		jMenuBar1.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 		jMenu1 = new javax.swing.JMenu();
@@ -132,7 +188,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 		jMenu1.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/insert.png")));
 		jMenu1.setFont(new Font("Segoe UI", Font.BOLD, 20));
 		jMenuItem1 = new javax.swing.JMenuItem();
-		jMenuItem1.setFont(new Font("Segoe UI", Font.BOLD, 16));
+		jMenuItem1.setFont(new Font("Segoe UI", Font.PLAIN, 16));
 		jMenuItem1.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/abrir.png")));
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -157,30 +213,24 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 
-				try {
+				LinkedList<String> imagenes = Metodos.directorio(Main.getDirectorioActual() + "Config"
+						+ Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(), ".", 1);
 
-					Metodos.renombrarArchivos(Main.getDirectorioActual() + "Config" + Main.getSeparador()
-							+ "imagenes_para_recortar" + Main.getSeparador() + "recortes" + Main.getSeparador(), ".",
-							true);
+				if (imagenes.size() == 0) {
 
-					ImageIcon icono = new ImageIcon(jMenuItem1ActionPerformed());
+					try {
 
-					int ancho = icono.getIconWidth();
+						Metodos.mensaje("La carpeta de las imagenes está vacía", 3);
 
-					int alto = icono.getIconHeight();
+						Metodos.abrirCarpeta(
+								Main.getDirectorioActual() + "Config" + Main.getSeparador() + "imagenes_para_recortar");
 
-					setSize(new Dimension(ancho, alto));
-
-					if (redimensionarJFrame(ancho, alto)) {
-						setExtendedState(JFrame.MAXIMIZED_BOTH);
+					} catch (IOException e) {
+						//
 					}
-
 				}
 
-				catch (Exception e) {
-					e.printStackTrace();
-					Metodos.mensaje("Error", 1);
-				}
+				siguienteImagen();
 
 			}
 
@@ -194,13 +244,16 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		JMenu mnNewMenu = new JMenu("Modo");
 		mnNewMenu.setForeground(Color.BLACK);
-		mnNewMenu.setFont(new Font("Segoe UI", Font.BOLD, 24));
+		mnNewMenu.setFont(new Font("Segoe UI", Font.PLAIN, 24));
 		mnNewMenu.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/config.png")));
 		jMenuBar1.add(mnNewMenu);
 
-		rdbtnmntmNewRadioItem.setFont(new Font("Segoe UI", Font.BOLD, 20));
+		rdbtnmntmNewRadioItem.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+
 		rdbtnmntmNewRadioItem.addMouseListener(new MouseAdapter() {
+
 			@Override
+
 			public void mousePressed(MouseEvent e) {
 
 				if (rdbtnmntmNewRadioItem.isSelected()) {
@@ -208,9 +261,15 @@ public class PhotoFrame extends javax.swing.JFrame {
 				}
 
 				else {
+
 					if (rdbtnmntmNewRadioItem_2.isSelected()) {
 						rdbtnmntmNewRadioItem_2.setSelected(false);
 					}
+
+					if (rdbtnmntmNewRadioItem_1.isSelected()) {
+						rdbtnmntmNewRadioItem_1.setSelected(false);
+					}
+
 				}
 
 			}
@@ -225,6 +284,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		JSeparator separator = new JSeparator();
 		mnNewMenu.add(separator);
+		rdbtnmntmNewRadioItem_2.setSelected(true);
 
 		rdbtnmntmNewRadioItem_2.addMouseListener(new MouseAdapter() {
 
@@ -232,15 +292,17 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 			public void mousePressed(MouseEvent e) {
 
-				if (rdbtnmntmNewRadioItem_2.isSelected()) {
-					rdbtnmntmNewRadioItem_2.setSelected(false);
+				if (rdbtnmntmNewRadioItem.isSelected()) {
+					rdbtnmntmNewRadioItem.setSelected(false);
 				}
 
-				else {
+				if (rdbtnmntmNewRadioItem_1.isSelected()) {
+					rdbtnmntmNewRadioItem_1.setSelected(false);
+				}
 
-					if (rdbtnmntmNewRadioItem.isSelected()) {
-						rdbtnmntmNewRadioItem.setSelected(false);
-					}
+				try {
+					redimensionar(imagen);
+				} catch (IOException e1) {
 
 				}
 
@@ -249,14 +311,54 @@ public class PhotoFrame extends javax.swing.JFrame {
 			@Override
 
 			public void mouseReleased(MouseEvent e) {
+				try {
+					redimensionar(imagen);
+				} catch (IOException e1) {
+
+				}
 				rabioBoxPorDefecto();
 			}
 
 		});
 
 		rdbtnmntmNewRadioItem_2.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/multiple.png")));
-		rdbtnmntmNewRadioItem_2.setFont(new Font("Segoe UI", Font.BOLD, 20));
+
+		rdbtnmntmNewRadioItem_2.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		mnNewMenu.add(rdbtnmntmNewRadioItem_2);
+
+		JSeparator separator_1 = new JSeparator();
+		mnNewMenu.add(separator_1);
+
+		rdbtnmntmNewRadioItem_1 = new JRadioButtonMenuItem("Normal");
+		rdbtnmntmNewRadioItem_1.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+		rdbtnmntmNewRadioItem_1.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/simple.png")));
+		rdbtnmntmNewRadioItem_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+
+				rdbtnmntmNewRadioItem_1.setSelected(true);
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+
+				if (!rdbtnmntmNewRadioItem_1.isSelected()) {
+					rdbtnmntmNewRadioItem_1.setSelected(true);
+				}
+
+				if (rdbtnmntmNewRadioItem_2.isSelected()) {
+					rdbtnmntmNewRadioItem_2.setSelected(false);
+				}
+				if (rdbtnmntmNewRadioItem.isSelected()) {
+					rdbtnmntmNewRadioItem.setSelected(false);
+				}
+
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+			}
+		});
+		mnNewMenu.add(rdbtnmntmNewRadioItem_1);
 
 		JLabel lblNewLabel2;
 		lblNewLabel2 = new JLabel("    ");
@@ -311,9 +413,9 @@ public class PhotoFrame extends javax.swing.JFrame {
 			}
 		});
 
-		JMenu mnAbrir = new JMenu("Abrir");
+		JMenu mnAbrir = new JMenu("Abrir ");
 		mnAbrir.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/folder.png")));
-		mnAbrir.setFont(new Font("Segoe UI", Font.BOLD, 24));
+		mnAbrir.setFont(new Font("Segoe UI", Font.PLAIN, 24));
 		mnAbrir.setForeground(Color.BLACK);
 		jMenuBar1.add(mnAbrir);
 
@@ -330,7 +432,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			}
 		});
 		mntmNewMenuItem.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/crop.png")));
-		mntmNewMenuItem.setFont(new Font("Segoe UI", Font.BOLD, 20));
+		mntmNewMenuItem.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		mntmNewMenuItem.setForeground(Color.BLACK);
 		mnAbrir.add(mntmNewMenuItem);
 
@@ -349,7 +451,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 			}
 		});
 		mntmNewMenuItem_1.setIcon(new ImageIcon(PhotoFrame.class.getResource("/imagenes/actualizar.png")));
-		mntmNewMenuItem_1.setFont(new Font("Segoe UI", Font.BOLD, 20));
+		mntmNewMenuItem_1.setFont(new Font("Segoe UI", Font.PLAIN, 20));
 		mntmNewMenuItem_1.setForeground(Color.BLACK);
 		mnAbrir.add(mntmNewMenuItem_1);
 
@@ -377,7 +479,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 	}
 
-	private String jMenuItem1ActionPerformed() throws IOException {
+	static String jMenuItem1ActionPerformed() throws IOException {
 
 		String imagen = "";
 
