@@ -31,6 +31,137 @@ import org.json.JSONObject;
 
 public abstract class Metodos {
 
+	public static void conversion(String extension, String salida, String carpeta) {
+
+		LinkedList<String> listaImagenes = directorio(carpeta, extension, true, false);
+
+		int resto = 3;
+
+		if (extension.length() == 4) {
+			resto = 5;
+		}
+
+		for (int i = 0; i < listaImagenes.size(); i++) {
+
+			File f1 = new File(carpeta + Main.getSeparador() + listaImagenes.get(i));
+
+			File f2 = new File(carpeta + Main.getSeparador()
+					+ listaImagenes.get(i).substring(0, listaImagenes.get(i).length() - resto) + "." + salida);
+
+			f1.renameTo(f2);
+
+		}
+
+		listaImagenes.clear();
+	}
+
+	public static void convertir(String carpeta) {
+
+		conversion("jpeg", "jpg", carpeta);
+
+		conversion("JPEG", "jpg", carpeta);
+
+		conversion("JPG", "jpg", carpeta);
+
+		conversion("PNG", "png", carpeta);
+
+		conversion("GIF", "gif", carpeta);
+
+	}
+
+	public static LinkedList<String> directorio(String ruta, String extension, boolean filtro, boolean carpeta) {
+
+		LinkedList<String> lista = new LinkedList<String>();
+
+		File f = new File(ruta);
+
+		if (f.exists()) {
+
+			File[] ficheros = f.listFiles();
+
+			String fichero = "";
+
+			String extensionArchivo;
+
+			File folder;
+
+			for (int x = 0; x < ficheros.length; x++) {
+
+				fichero = ficheros[x].getName();
+
+				folder = new File(ruta + fichero);
+
+				if (filtro) {
+
+					if (folder.isFile()) {
+
+						extensionArchivo = extraerExtension(fichero);
+
+						if (fichero.length() > 5 && fichero.substring(0, fichero.length() - 5).contains(".")) {
+
+							renombrar(ruta + fichero, ruta + eliminarPuntos(fichero));
+
+						}
+
+						if (extension.equals("webp") && extensionArchivo.equals("webp")
+								|| extension.equals("jpeg") && extensionArchivo.equals("jpeg") || extension.equals(".")
+								|| extension.equals(extensionArchivo)) {
+
+							if (carpeta) {
+								lista.add(ruta + fichero);
+							}
+
+							else {
+								lista.add(fichero);
+							}
+
+						}
+
+					}
+
+				}
+
+				else {
+
+					if (folder.isDirectory()) {
+
+						if (carpeta) {
+							lista.add(ruta + fichero);
+						}
+
+						else {
+
+							fichero = fichero.trim();
+
+							if (!fichero.isEmpty()) {
+								lista.add(fichero);
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		return lista;
+
+	}
+
+	public static String eliminarEspacios(String cadena) {
+
+		cadena = cadena.trim();
+
+		cadena = cadena.replace("  ", " ");
+
+		cadena = cadena.trim();
+
+		return cadena;
+	}
+
 	public static LinkedList<String> directorio(String ruta, String extension, int filtro) {
 
 		LinkedList<String> lista = new LinkedList<>();
