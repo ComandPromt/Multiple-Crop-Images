@@ -28,10 +28,9 @@ import javax.swing.JPopupMenu;
 
 public class PhotoPanel extends JPanel implements MouseMotionListener, MouseListener {
 
-	private static final long serialVersionUID = 1L;
 	transient Image photo;
 	transient BufferedImage bufferedImage;
-	LinkedList<String> listaImagenes = new LinkedList<>();
+	static LinkedList<String> listaImagenes = new LinkedList<>();
 	int count = 0;
 
 	private Color color1 = new Color(255, 255, 255);
@@ -55,9 +54,9 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 	private JPopupMenu popupMenu = new JPopupMenu();
 
-	String directorioActual = Main.getDirectorioActual();
+	static String directorioActual = Main.getDirectorioActual();
 
-	String carpetaRecortes = directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+	public static String carpetaRecortes = directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
 			+ Main.getSeparador() + "recortes";
 
 	public PhotoPanel() {
@@ -255,12 +254,18 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				else {
 
-					String imagenSelecionada = PhotoFrame.fileChooser.getSelectedFile().toString();
+					String imagenSelecionada;
 
-					imagenSelecionada = imagenSelecionada.substring(
-							imagenSelecionada.lastIndexOf(Main.getSeparador()) + 1, imagenSelecionada.length());
+					try {
+						imagenSelecionada = saberImagenSeleccionada();
+					}
+
+					catch (NullPointerException e) {
+						imagenSelecionada = listaImagenes.get(0);
+					}
 
 					listaImagenes.set(0, imagenSelecionada);
+
 				}
 
 				String extension;
@@ -285,6 +290,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 					}
 
 					else {
+
 						cambio = true;
 					}
 
@@ -369,6 +375,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				int n = 2;
 
+				Metodos.renombrarArchivos(carpetaRecortes + Main.getSeparador(), ".", true);
+
 				--y;
 
 				PhotoFrame.photoPanel.setBackground(Color.WHITE);
@@ -377,7 +385,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				PhotoFrame.getjPanel1().add(PhotoFrame.photoPanel);
 
-				if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() && y > 0 && y <= 170) {
+				if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() && y > 0) {
 
 					paso = 0;
 
@@ -386,7 +394,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 					listaImagenes.clear();
 
 					listaImagenes = Metodos.directorio(carpetaRecortes + Main.getSeparador(), ".", true, true);
-
 					try {
 
 						if (Main.getSonido()[1].equals("1")) {
@@ -442,7 +449,51 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		catch (Exception e) {
 
+			e.printStackTrace();
+			PhotoFrame.actualizar();
+
+			PhotoFrame.verFoto(0);
+
 		}
+
+	}
+
+	static String saberImagenSeleccionada() {
+
+		String imagenSelecionada;
+
+		try {
+
+			imagenSelecionada = PhotoFrame.fileChooser.getSelectedFile().toString();
+
+			imagenSelecionada = imagenSelecionada.substring(imagenSelecionada.lastIndexOf(Main.getSeparador()) + 1,
+					imagenSelecionada.length());
+		}
+
+		catch (NullPointerException e) {
+
+			try {
+
+				imagenSelecionada = PhotoFrame.listaImagenes.get(paso);
+			}
+
+			catch (Exception e1) {
+
+				try {
+
+					imagenSelecionada = PhotoFrame.listaImagenes.get(0);
+				}
+
+				catch (Exception e2) {
+
+					imagenSelecionada = "";
+				}
+
+			}
+
+		}
+
+		return imagenSelecionada;
 	}
 
 	@Override
@@ -491,18 +542,28 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	public void mouseReleased(MouseEvent e) {
 
 		clipX = x1;
+
 		clipY = y1;
+
 		clipWidth = Math.abs(dx1x2);
+
 		clipHeight = Math.abs(dy1y2);
 
 		if (dx1x2 < 0 && dy1y2 < 0) {
 			clipX = clipX - Math.abs(dx1x2);
+
 			clipY = clipY - Math.abs(dy1y2);
+
 		} else if (dy1y2 < 0) {
+
 			clipY = clipY - Math.abs(dy1y2);
+
 		} else if (dx1x2 < 0) {
+
 			clipX = clipX - Math.abs(dx1x2);
+
 		}
+
 		showPopup(e);
 	}
 

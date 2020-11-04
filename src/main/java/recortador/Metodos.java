@@ -4,6 +4,7 @@ import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,9 +13,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -67,6 +72,106 @@ public abstract class Metodos {
 
 		conversion("GIF", "gif", carpeta);
 
+	}
+
+	public static String getSHA256Checksum(String filename) {
+
+		String result = "";
+
+		try {
+
+			byte[] b;
+
+			b = createChecksum(filename);
+
+			StringBuilder bld = new StringBuilder();
+
+			for (int i = 0; i < b.length; i++) {
+				bld.append(Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1));
+			}
+
+			result = bld.toString();
+
+		} catch (Exception e) {
+			//
+		}
+
+		return result;
+	}
+
+	public static byte[] createChecksum(String filename) throws NoSuchAlgorithmException, IOException {
+
+		InputStream fis = null;
+
+		MessageDigest complete = MessageDigest.getInstance("SHA-256");
+
+		try {
+
+			fis = new FileInputStream(filename);
+
+			byte[] buffer = new byte[1024];
+
+			int numRead;
+
+			do {
+
+				numRead = fis.read(buffer);
+
+				if (numRead > 0) {
+					complete.update(buffer, 0, numRead);
+				}
+
+			}
+
+			while (numRead != -1);
+
+			fis.close();
+
+		}
+
+		catch (IOException e) {
+
+			if (fis != null) {
+				fis.close();
+			}
+
+		}
+
+		return complete.digest();
+	}
+
+	public static List<String> borrarArchivosDuplicados(String directorio) {
+
+		LinkedList<String> listaImagenes = directorio(directorio, ".", true, false);
+
+		LinkedList<String> listaImagenesSha = new LinkedList<String>();
+
+		for (int i = 0; i < listaImagenes.size(); i++) {
+			listaImagenesSha.add(getSHA256Checksum(directorio + Main.getSeparador() + listaImagenes.get(i)));
+		}
+
+		List<String> duplicateList = listaImagenesSha.stream()
+
+				.collect(Collectors.groupingBy(s -> s)).entrySet().stream()
+
+				.filter(e -> e.getValue().size() > 1).map(e -> e.getKey()).collect(Collectors.toList());
+
+		int indice = 0;
+
+		for (String archivoRepetido : duplicateList) {
+
+			for (int i = 0; i < Collections.frequency(listaImagenesSha, archivoRepetido) - 1; i++) {
+
+				indice = listaImagenesSha.indexOf(archivoRepetido);
+
+				eliminarFichero(directorio + listaImagenes.get(indice));
+
+				listaImagenes.remove(indice);
+			}
+
+		}
+
+		return listaImagenes;
 	}
 
 	public static LinkedList<String> directorio(String ruta, String extension, boolean filtro, boolean carpeta) {
@@ -510,9 +615,8 @@ public abstract class Metodos {
 			} catch (IOException e) {
 				mensaje("Ruta inválida", 1);
 			}
-		} else {
-			new Config().setVisible(true);
 		}
+
 	}
 
 	public static int listarFicherosPorCarpeta(final File carpeta) {

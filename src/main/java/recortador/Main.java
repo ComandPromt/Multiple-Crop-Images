@@ -90,21 +90,9 @@ public class Main {
 
 			}
 
-			else {
-				new Config().setVisible(true);
-			}
-
 		}
 
 		catch (ArrayIndexOutOfBoundsException e1) {
-
-			try {
-				new Config().setVisible(true);
-			}
-
-			catch (IOException e) {
-				//
-			}
 
 		}
 
@@ -149,7 +137,7 @@ public class Main {
 		}
 
 		catch (Exception e) {
-			new Config().setVisible(true);
+
 		}
 	}
 
@@ -163,14 +151,8 @@ public class Main {
 
 		catch (IOException e1) {
 
-			try {
-				new Config().setVisible(true);
-			}
-
-			catch (IOException e2) {
-				Metodos.mensaje("Error", 1);
-			}
 		}
+
 	}
 
 	public static void main(String[] args) {
@@ -199,7 +181,7 @@ public class Main {
 		}
 
 		catch (Exception e1) {
-			//
+			e1.printStackTrace();
 		}
 	}
 }
