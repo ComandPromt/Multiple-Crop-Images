@@ -28,8 +28,12 @@ import javax.swing.JPopupMenu;
 
 public class PhotoPanel extends JPanel implements MouseMotionListener, MouseListener {
 
+	private static final long serialVersionUID = 1L;
+
 	transient Image photo;
+
 	transient BufferedImage bufferedImage;
+
 	static LinkedList<String> listaImagenes = new LinkedList<>();
 	int count = 0;
 
@@ -54,11 +58,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 	private JPopupMenu popupMenu = new JPopupMenu();
 
-	static String directorioActual = Main.getDirectorioActual();
-
-	public static String carpetaRecortes = directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
-			+ Main.getSeparador() + "recortes";
-
 	public PhotoPanel() {
 
 		super();
@@ -75,7 +74,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		menuItem.addActionListener((ActionEvent e) -> {
 
-			guardar();
+			PhotoFrame.recortar();
 
 		});
 
@@ -118,7 +117,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		catch (Exception e1) {
 
-			File directorio = new File(carpetaRecortes);
+			File directorio = new File(PhotoFrame.carpetaRecortes);
 
 			directorio.mkdir();
 
@@ -228,9 +227,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 			listaImagenes.clear();
 
-			listaImagenes = Metodos.directorio(
-					directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar" + Main.getSeparador(),
-					".", true, false);
+			listaImagenes = Metodos.directorio(PhotoFrame.directorio + Main.getSeparador(), ".", true, false);
 
 			listaImagenes.sort(String::compareToIgnoreCase);
 
@@ -240,7 +237,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				count = 1;
 
-				int numeroImagen = Metodos.listarFicherosPorCarpeta(new File(carpetaRecortes));
+				int numeroImagen = Metodos.listarFicherosPorCarpeta(new File(PhotoFrame.carpetaRecortes));
 
 				if (numeroImagen > 0) {
 
@@ -272,7 +269,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				String numero = "";
 
-				int y = Metodos.directorio(carpetaRecortes + Main.getSeparador(), ".", true, false).size() + 1;
+				int y = Metodos.directorio(PhotoFrame.carpetaRecortes + Main.getSeparador(), ".", true, false).size()
+						+ 1;
 
 				int inicio = 0;
 
@@ -280,8 +278,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					if (paso >= listaImagenes.size()) {
 
-						setPhoto(ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador()
-								+ "imagenes_para_recortar" + Main.getSeparador() + listaImagenes.get(0))));
+						setPhoto(ImageIO
+								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(0))));
 
 						cambio = false;
 
@@ -317,8 +315,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 						extension = "jpg";
 					}
 
-					photo = ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador()
-							+ "imagenes_para_recortar" + Main.getSeparador() + listaImagenes.get(x)));
+					photo = ImageIO.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(x)));
 
 					tmpRecorte = ((BufferedImage) photo).getSubimage((int) clipX, (int) clipY, (int) clipWidth,
 							(int) clipHeight);
@@ -343,8 +340,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					y++;
 
-					ImageIO.write(tmpRecorte, extension,
-							new File(carpetaRecortes + Main.getSeparador() + "Image_" + numero + "." + extension));
+					ImageIO.write(tmpRecorte, extension, new File(
+							PhotoFrame.carpetaRecortes + Main.getSeparador() + "Image_" + numero + "." + extension));
 				}
 
 				if (PhotoFrame.rdbtnmntmNormal.isSelected()) {
@@ -357,13 +354,13 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					if (cambio) {
 
-						setPhoto(ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador()
-								+ "imagenes_para_recortar" + Main.getSeparador() + listaImagenes.get(paso))));
+						setPhoto(ImageIO
+								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(paso))));
 					}
 
 					else {
-						setPhoto(ImageIO.read(new File(directorioActual + "Config" + Main.getSeparador()
-								+ "imagenes_para_recortar" + Main.getSeparador() + listaImagenes.get(0))));
+						setPhoto(ImageIO
+								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(0))));
 					}
 
 					++paso;
@@ -375,7 +372,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				int n = 2;
 
-				Metodos.renombrarArchivos(carpetaRecortes + Main.getSeparador(), ".", true);
+				Metodos.renombrarArchivos(PhotoFrame.carpetaRecortes + Main.getSeparador(), ".", true);
 
 				--y;
 
@@ -393,7 +390,9 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					listaImagenes.clear();
 
-					listaImagenes = Metodos.directorio(carpetaRecortes + Main.getSeparador(), ".", true, true);
+					listaImagenes = Metodos.directorio(PhotoFrame.carpetaRecortes + Main.getSeparador(), ".", true,
+							true);
+
 					try {
 
 						if (Main.getSonido()[1].equals("1")) {
@@ -401,7 +400,9 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 									Main.getDirectorioActual() + "sonidos" + Main.getSeparador() + "gong.wav", true);
 						}
 
-					} catch (Exception e) {
+					}
+
+					catch (Exception e) {
 						//
 					}
 
@@ -420,25 +421,23 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					switch (numerOpcion) {
 
-					case 1:
-						Metodos.abrirCarpeta(
-								directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar");
+					case 4:
+						Metodos.abrirCarpeta(PhotoFrame.directorio);
 						break;
 
-					case 2:
+					case 5:
 						numerOpcion = 0;
 						break;
 
-					case 3:
-						Metodos.eliminarArchivos(directorioActual + "Config" + Main.getSeparador()
-								+ "imagenes_para_recortar" + Main.getSeparador());
+					case 6:
+						Metodos.eliminarArchivos(PhotoFrame.directorio + Main.getSeparador());
 						break;
 
 					}
 
 					if (n > 0 && numerOpcion == 0) {
 
-						Metodos.abrirCarpeta(carpetaRecortes);
+						Metodos.abrirCarpeta(PhotoFrame.carpetaRecortes);
 
 					}
 
@@ -448,11 +447,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 		}
 
 		catch (Exception e) {
-
-			e.printStackTrace();
-			PhotoFrame.actualizar();
-
-			PhotoFrame.verFoto(0);
 
 		}
 

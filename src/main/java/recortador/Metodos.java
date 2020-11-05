@@ -2,11 +2,9 @@ package recortador;
 
 import java.awt.Font;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -331,8 +329,11 @@ public abstract class Metodos {
 	}
 
 	public static JSONObject apiImagenes(String parametros) throws IOException {
+
 		JSONObject json = readJsonFromUrl("https://apiperiquito.herokuapp.com/recibo-json.php?imagenes=" + parametros);
+
 		return json;
+
 	}
 
 	public static JSONObject readJsonFromUrl(String url) throws IOException {
@@ -466,6 +467,7 @@ public abstract class Metodos {
 	public static void renombrar(String ruta1, String ruta2) {
 
 		File f1 = new File(ruta1);
+
 		File f2 = new File(ruta2);
 
 		f1.renameTo(f2);
@@ -524,11 +526,15 @@ public abstract class Metodos {
 	}
 
 	public static String saberSeparador(String os) {
+
 		if (os.equals("Linux")) {
 			return "/";
-		} else {
+		}
+
+		else {
 			return "\\";
 		}
+
 	}
 
 	public static String eliminarPuntos(String cadena) {
@@ -644,70 +650,11 @@ public abstract class Metodos {
 				if (permitidos.contains(extension)) {
 					ocurrencias++;
 				}
+
 			}
 		}
 
 		return ocurrencias;
-	}
-
-	public static void crearScript(String archivo, String contenido, boolean opcional, String os) throws IOException {
-
-		Process aplicacion = null;
-
-		if (os.equals("Linux")) {
-			aplicacion = Runtime.getRuntime().exec("bash " + contenido);
-			aplicacion.destroy();
-		}
-
-		else {
-
-			String iniciar = "";
-
-			if (opcional) {
-				iniciar = "start";
-			}
-
-			FileWriter flS = new FileWriter(archivo);
-
-			BufferedWriter fS = new BufferedWriter(flS);
-
-			try {
-				Runtime aplicacion2 = Runtime.getRuntime();
-				fS.write("@echo off");
-				fS.newLine();
-				fS.write(contenido);
-				fS.newLine();
-				fS.write("exit");
-				aplicacion2 = Runtime.getRuntime();
-
-				try {
-					aplicacion2.exec("cmd.exe /K " + iniciar + " " + System.getProperty("user.dir") + "\\" + archivo);
-				}
-
-				catch (Exception e) {
-//
-				}
-
-			}
-
-			finally {
-				fS.close();
-				flS.close();
-
-			}
-		}
-
-	}
-
-	public static void cambiarPermisos() {
-
-		try {
-			Metodos.crearScript("change_permisos.sh", "sudo chmod 777 -R /var/www", true, Main.getOs());
-		}
-
-		catch (Exception e1) {
-			//
-		}
 	}
 
 	public static void crearCarpetas() {
@@ -724,7 +671,7 @@ public abstract class Metodos {
 		directorio = new File("Config/imagenes_para_recortar/recortes");
 		directorio.mkdir();
 
-		directorio = new File("Config/Image_rotate");
+		directorio = new File("Config/imagenes_para_recortar/recortes/Image_rotate");
 		directorio.mkdir();
 
 		directorio = new File("sonidos");
@@ -747,12 +694,15 @@ public abstract class Metodos {
 		try {
 
 			flE = new FileReader(fichero);
+
 			fE = new BufferedReader(flE);
+
 			texto = fE.readLine();
 
 			while (texto != null && i < longitud) {
 
 				salida[i] = texto;
+
 				i++;
 
 				texto = fE.readLine();
@@ -760,6 +710,7 @@ public abstract class Metodos {
 			}
 
 			fE.close();
+
 			flE.close();
 
 		}
@@ -771,18 +722,24 @@ public abstract class Metodos {
 		finally {
 
 			if (fE != null) {
+
 				try {
 					fE.close();
-				} catch (IOException e) {
+				}
+
+				catch (IOException e) {
 					//
 				}
+
 			}
 
 			if (flE != null) {
 
 				try {
 					flE.close();
-				} catch (IOException e) {
+				}
+
+				catch (IOException e) {
 					//
 				}
 
@@ -796,6 +753,7 @@ public abstract class Metodos {
 	public static java.io.File[] seleccionar(int tipo, String rotulo, String mensaje) {
 
 		JFileChooser chooser = new JFileChooser();
+
 		FileNameExtensionFilter filter = null;
 
 		switch (tipo) {
@@ -827,6 +785,7 @@ public abstract class Metodos {
 		}
 
 		chooser.showOpenDialog(chooser);
+
 		File[] files = chooser.getSelectedFiles();
 
 		if (files.length == 0) {
@@ -836,35 +795,18 @@ public abstract class Metodos {
 		return files;
 	}
 
-	public static void cerrarNavegador() {
-
-		try {
-
-			if (!Main.getOs().equals("Linux")) {
-				crearScript("cerrar.bat", "taskkill /F /IM chromedriver.exe /T", true, Main.getOs());
-
-			}
-
-			else {
-				crearScript("cerrar.sh", "kilall chrome", true, Main.getOs());
-			}
-
-		} catch (Exception e) {
-			Metodos.mensaje("Error al cerrar el navegador", 1);
-		}
-
-	}
-
 	public static int listarFicherosPorCarpeta(final File carpeta, String filtro) {
 
 		int ocurrencias = 0;
 
 		String extension;
+
 		String nombreArchivo;
 
 		for (final File ficheroEntrada : carpeta.listFiles()) {
 
 			nombreArchivo = ficheroEntrada.getName();
+
 			extension = extraerExtension(nombreArchivo);
 
 			if (extension.equals(filtro) || filtro.equals(".")) {
@@ -914,13 +856,17 @@ public abstract class Metodos {
 	public static void renombrarArchivos(List<String> list, String ruta) {
 
 		File f1;
+
 		File f2;
 
 		for (int x = 0; x < list.size(); x++) {
 
 			f1 = new File(ruta + list.get(x));
+
 			f2 = new File(ruta + eliminarPuntos(list.get(x)));
+
 			f1.renameTo(f2);
+
 		}
 
 	}
