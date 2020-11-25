@@ -821,13 +821,13 @@ public abstract class Metodos {
 
 	public static void eliminarArchivos(String ruta) {
 
-		LinkedList<String> frames = Metodos.directorio(ruta, ".", 1);
+		LinkedList<String> frames = directorio(ruta, ".", true, false);
 
 		for (int i = 0; i < frames.size(); i++) {
 
 			if (!frames.get(i).isEmpty()) {
 
-				eliminarFichero(ruta + Main.getSeparador() + frames.get(i));
+				eliminarFichero(ruta + frames.get(i));
 			}
 
 		}
@@ -870,4 +870,5 @@ public abstract class Metodos {
 		}
 
 	}
+
 }

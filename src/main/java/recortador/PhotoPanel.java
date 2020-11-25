@@ -35,25 +35,31 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	transient BufferedImage bufferedImage;
 
 	static LinkedList<String> listaImagenes = new LinkedList<>();
+
 	int count = 0;
 
 	private Color color1 = new Color(255, 255, 255);
+
 	private Color color2 = new Color(0, 0, 0);
 
 	transient BufferedImage tmpRecorte;
+
 	private boolean cambio = true;
+
 	private float clipX = 0;
 	private float clipY = 0;
 	private float clipWidth;
 	private float clipHeight;
 	public static int paso = 1;
+
+	public static boolean penultimaFoto = false;
 	private int x1 = 0;
 	private int y1 = 0;
 	private int dx1x2 = 0;
 	private int dy1y2 = 0;
 	private int x2 = 0;
 	private int y2 = 0;
-
+	public static int entrada;
 	boolean band = true;
 
 	private JPopupMenu popupMenu = new JPopupMenu();
@@ -225,6 +231,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		try {
 
+			entrada = paso;
+
 			listaImagenes.clear();
 
 			listaImagenes = Metodos.directorio(PhotoFrame.directorio + Main.getSeparador(), ".", true, false);
@@ -274,37 +282,11 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				int inicio = 0;
 
-				if (PhotoFrame.rdbtnmntmNormal.isSelected()) {
+				inicio = paso;
 
-					if (paso >= listaImagenes.size()) {
+				vueltas = paso;
 
-						setPhoto(ImageIO
-								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(0))));
-
-						cambio = false;
-
-						paso = 0;
-
-					}
-
-					else {
-
-						cambio = true;
-					}
-
-					inicio = paso;
-
-					vueltas = paso;
-
-					++vueltas;
-
-					++paso;
-
-					PhotoFrame.recorrido.setText(paso + " / " + listaImagenes.size());
-
-					--paso;
-
-				}
+				++vueltas;
 
 				for (int x = inicio; x < vueltas; x++) {
 
@@ -345,29 +327,48 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 				}
 
 				if (PhotoFrame.rdbtnmntmNormal.isSelected()) {
+/////////////////////////////////////////////////////////
 
-					if (paso >= listaImagenes.size() - 1) {
-						paso = -1;
+					int ultimaFoto = listaImagenes.size();
+
+					--ultimaFoto;
+
+					if (paso == entrada && ++entrada == ultimaFoto) {
+						--paso;
+						penultimaFoto = true;
+					} else {
+						penultimaFoto = false;
 					}
 
 					++paso;
 
-					if (cambio) {
-
-						setPhoto(ImageIO
-								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(paso))));
+					if (paso == listaImagenes.size()) {
+						--paso;
 					}
 
-					else {
-						setPhoto(ImageIO
-								.read(new File(PhotoFrame.directorio + Main.getSeparador() + listaImagenes.get(0))));
+					if (penultimaFoto && PhotoFrame.recortar) {
+
+						paso = listaImagenes.size() - 3;
 					}
 
-					++paso;
+					if (PhotoFrame.reemplazar.isSelected() && (paso < entrada)) {
 
-					PhotoFrame.recorrido.setText(paso + " / " + listaImagenes.size());
+						paso = --entrada;
 
-					--paso;
+					}
+
+					if (PhotoFrame.recortar) {
+
+						--paso;
+
+						if (!PhotoFrame.reemplazar.isSelected()) {
+
+							++paso;
+
+						}
+					}
+
+					PhotoFrame.verFoto(paso);
 				}
 
 				int n = 2;
@@ -421,15 +422,15 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 					switch (numerOpcion) {
 
-					case 4:
+					case 1:
 						Metodos.abrirCarpeta(PhotoFrame.directorio);
 						break;
 
-					case 5:
+					case 2:
 						numerOpcion = 0;
 						break;
 
-					case 6:
+					case 3:
 						Metodos.eliminarArchivos(PhotoFrame.directorio + Main.getSeparador());
 						break;
 
@@ -562,16 +563,15 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	}
 
 	public void mouseEntered(MouseEvent e) {
-//
+
 	}
 
 	public void mouseExited(MouseEvent e) {
-//
+
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		// TODO Auto-generated method stub
 
 	}
 
