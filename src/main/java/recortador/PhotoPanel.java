@@ -44,8 +44,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 	transient BufferedImage tmpRecorte;
 
-	private boolean cambio = true;
-
 	private float clipX = 0;
 	private float clipY = 0;
 	private float clipWidth;

@@ -64,8 +64,6 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 	private static boolean rotar = false;
 
-	private static int contador = 0;
-
 	public static LinkedList<String> listaImagenes = new LinkedList<>();
 
 	javax.swing.JScrollPane jScrollPane1;
