@@ -64,6 +64,8 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 	private static boolean rotar = false;
 
+	private static int contador = 0;
+
 	public static LinkedList<String> listaImagenes = new LinkedList<>();
 
 	javax.swing.JScrollPane jScrollPane1;
@@ -361,27 +363,29 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 				photoPanel.guardar();
 
-				PhotoPanel.paso = PhotoPanel.entrada;
+				if (PhotoFrame.rdbtnmntmNormal.isSelected()) {
 
-				if (PhotoPanel.paso > PhotoPanel.entrada) {
-					--PhotoPanel.paso;
-				}
-
-				if (PhotoPanel.entrada < PhotoPanel.paso) {
 					PhotoPanel.paso = PhotoPanel.entrada;
+
+					if (PhotoPanel.paso > PhotoPanel.entrada) {
+						--PhotoPanel.paso;
+					}
+
+					if (PhotoPanel.entrada < PhotoPanel.paso) {
+						PhotoPanel.paso = PhotoPanel.entrada;
+					}
+
+					if (PhotoPanel.entrada == listaImagenes.size()) {
+						PhotoPanel.paso = listaImagenes.size() - 1;
+					}
+
+					if (PhotoPanel.entrada == listaImagenes.size() - 1 || PhotoPanel.paso == listaImagenes.size()) {
+
+						PhotoPanel.paso = listaImagenes.size() - 1;
+
+						verFoto(PhotoPanel.paso);
+					}
 				}
-
-				if (PhotoPanel.entrada == listaImagenes.size()) {
-					PhotoPanel.paso = listaImagenes.size() - 1;
-				}
-
-				if (PhotoPanel.entrada == listaImagenes.size() - 1 || PhotoPanel.paso == listaImagenes.size()) {
-
-					PhotoPanel.paso = listaImagenes.size() - 1;
-
-					verFoto(PhotoPanel.paso);
-				}
-
 			}
 
 			if (reemplazar.isSelected()) {
@@ -555,7 +559,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		setMinimumSize(new Dimension(900, 300));
 
-		PhotoFrame.this.setTitle("Recortador Masivo De Imagenes");
+		PhotoFrame.this.setTitle("Periquito - Crop");
 
 		PhotoFrame.this.setLocationRelativeTo(null);
 

@@ -44,6 +44,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 	transient BufferedImage tmpRecorte;
 
+	private boolean cambio = true;
+
 	private float clipX = 0;
 	private float clipY = 0;
 	private float clipWidth;
@@ -286,6 +288,12 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				++vueltas;
 
+				if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected()) {
+
+					vueltas = listaImagenes.size();
+
+				}
+
 				for (int x = inicio; x < vueltas; x++) {
 
 					extension = listaImagenes.get(x).substring(listaImagenes.get(x).length() - 3,
@@ -325,7 +333,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 				}
 
 				if (PhotoFrame.rdbtnmntmNormal.isSelected()) {
-/////////////////////////////////////////////////////////
 
 					int ultimaFoto = listaImagenes.size();
 
@@ -405,9 +412,12 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 						//
 					}
 
-					String[] options = { "<html><h2>[1] Abrir imagenes para recortar</h2></html>",
-							"<html><h2>[2] Abrir carpeta de salida</h2></html>",
-							"<html><h2>[3] Borrar imagenes para recortar</h2></html>" };
+					String[] options = { "<html><h2>[1] Subir al CMS</h2></html>",
+							"<html><h2>[2] Mover a la carpeta imagenes</h2></html>",
+							"<html><h2>[3] Hacer GIF</h2></html>",
+							"<html><h2>[4] Abrir imagenes para recortar</h2></html>",
+							"<html><h2>[5] Abrir carpeta de salida</h2></html>",
+							"<html><h2>[6] Borrar imagenes para recortar</h2></html>" };
 
 					ImageIcon icon = new ImageIcon(Main.class.getResource("/imagenes/utilities.png"));
 
@@ -425,18 +435,12 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 						break;
 
 					case 2:
-						numerOpcion = 0;
+						Metodos.abrirCarpeta(PhotoFrame.carpetaRecortes);
 						break;
 
 					case 3:
 						Metodos.eliminarArchivos(PhotoFrame.directorio + Main.getSeparador());
 						break;
-
-					}
-
-					if (n > 0 && numerOpcion == 0) {
-
-						Metodos.abrirCarpeta(PhotoFrame.carpetaRecortes);
 
 					}
 
