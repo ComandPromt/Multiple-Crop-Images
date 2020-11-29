@@ -659,22 +659,24 @@ public abstract class Metodos {
 
 	public static void crearCarpetas() {
 
-		File directorio = new File("Config");
+		File directorio = new File(Main.directorioActual + "Config");
 		directorio.mkdir();
 
-		directorio = new File("Config/imagenes");
+		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes");
 		directorio.mkdir();
 
-		directorio = new File("Config/imagenes_para_recortar");
+		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar");
 		directorio.mkdir();
 
-		directorio = new File("Config/imagenes_para_recortar/recortes");
+		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+				+ Main.getSeparador() + "recortes");
 		directorio.mkdir();
 
-		directorio = new File("Config/imagenes_para_recortar/recortes/Image_rotate");
+		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar"
+				+ Main.getSeparador() + "recortes" + Main.getSeparador() + "Image_rotate");
 		directorio.mkdir();
 
-		directorio = new File("sonidos");
+		directorio = new File(Main.directorioActual + "sonidos");
 
 		directorio.mkdir();
 	}
