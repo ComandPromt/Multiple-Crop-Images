@@ -19,11 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -548,7 +543,7 @@ public abstract class Metodos {
 
 	public static void mensaje(String mensaje, int titulo) {
 
-		String tituloSuperior = "", sonido = "";
+		String tituloSuperior = "";
 
 		int tipo = 0;
 
@@ -557,34 +552,24 @@ public abstract class Metodos {
 		case 1:
 			tipo = JOptionPane.ERROR_MESSAGE;
 			tituloSuperior = "Error";
-			sonido = "duck-quack.wav";
+
 			break;
 
 		case 2:
 			tipo = JOptionPane.INFORMATION_MESSAGE;
 			tituloSuperior = "Informacion";
-			sonido = "gong.wav";
+
 			break;
 
 		case 3:
 			tipo = JOptionPane.WARNING_MESSAGE;
 			tituloSuperior = "Advertencia";
-			sonido = "advertencia.wav";
+
 			break;
 
 		default:
 			break;
 
-		}
-
-		try {
-
-			if (Main.getSonido()[1].equals("1")) {
-				reproducirSonido(Main.getDirectorioActual() + "sonidos" + Main.getSeparador() + sonido, true);
-			}
-
-		} catch (Exception e) {
-			//
 		}
 
 		JLabel alerta = new JLabel(mensaje);
@@ -662,9 +647,6 @@ public abstract class Metodos {
 		File directorio = new File(Main.directorioActual + "Config");
 		directorio.mkdir();
 
-		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes");
-		directorio.mkdir();
-
 		directorio = new File(Main.directorioActual + "Config" + Main.getSeparador() + "imagenes_para_recortar");
 		directorio.mkdir();
 
@@ -676,9 +658,6 @@ public abstract class Metodos {
 				+ Main.getSeparador() + "recortes" + Main.getSeparador() + "Image_rotate");
 		directorio.mkdir();
 
-		directorio = new File(Main.directorioActual + "sonidos");
-
-		directorio.mkdir();
 	}
 
 	public static String[] leerFicheroArray(String fichero, int longitud) {
@@ -832,25 +811,6 @@ public abstract class Metodos {
 				eliminarFichero(ruta + frames.get(i));
 			}
 
-		}
-
-	}
-
-	public static void reproducirSonido(String nombreSonido, boolean repetir) {
-
-		try {
-
-			AudioInputStream audioInputStream = AudioSystem
-					.getAudioInputStream(new File(nombreSonido).getAbsoluteFile());
-
-			Clip clip = AudioSystem.getClip();
-
-			clip.open(audioInputStream);
-
-			clip.start();
-
-		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
-			//
 		}
 
 	}

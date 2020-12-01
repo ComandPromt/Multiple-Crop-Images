@@ -395,19 +395,6 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 					listaImagenes = Metodos.directorio(PhotoFrame.carpetaRecortes + Main.getSeparador(), ".", true,
 							true);
 
-					try {
-
-						if (Main.getSonido()[1].equals("1")) {
-							Metodos.reproducirSonido(
-									Main.getDirectorioActual() + "sonidos" + Main.getSeparador() + "gong.wav", true);
-						}
-
-					}
-
-					catch (Exception e) {
-						//
-					}
-
 					String[] options = { "<html><h2>[1] Subir al CMS</h2></html>",
 							"<html><h2>[2] Mover a la carpeta imagenes</h2></html>",
 							"<html><h2>[3] Hacer GIF</h2></html>",

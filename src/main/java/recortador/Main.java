@@ -16,16 +16,6 @@ public class Main {
 
 	static String directorioActual = "";
 
-	public static String[] getSonido() {
-		return sonido;
-	}
-
-	public static void setSonido(String[] sonido) {
-		Main.sonido = sonido;
-	}
-
-	static String[] sonido = Metodos.leerFicheroArray("Config/sonido.txt", 2);
-
 	static String os = System.getProperty("os.name");
 
 	private static String[] lectura = Metodos.leerFicheroArray("Config/Config.txt", 2);

@@ -557,7 +557,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 
 		setMinimumSize(new Dimension(900, 300));
 
-		PhotoFrame.this.setTitle("Periquito - Crop");
+		PhotoFrame.this.setTitle("Recortador Multiple De Imagenes");
 
 		PhotoFrame.this.setLocationRelativeTo(null);
 
@@ -1001,7 +1001,7 @@ public class PhotoFrame extends javax.swing.JFrame {
 					Metodos.abrirCarpeta(directorio);
 				}
 
-				catch (IOException e1) {
+				catch (Exception e1) {
 					//
 				}
 
