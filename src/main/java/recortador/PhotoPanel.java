@@ -231,11 +231,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 			entrada = paso;
 
-			listaImagenes.clear();
-
-			listaImagenes = Metodos.directorio(PhotoFrame.directorio + Main.getSeparador(), ".", true, false);
-
-			listaImagenes.sort(String::compareToIgnoreCase);
+			verImagenes();
 
 			if (!listaImagenes.isEmpty()) {
 
@@ -354,7 +350,8 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 						paso = listaImagenes.size() - 3;
 					}
 
-					if (PhotoFrame.reemplazar.isSelected() && (paso < entrada)) {
+					if (!PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() && PhotoFrame.reemplazar.isSelected()
+							&& paso < entrada) {
 
 						paso = --entrada;
 
@@ -364,7 +361,7 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 						--paso;
 
-						if (!PhotoFrame.reemplazar.isSelected()) {
+						if (!PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() && !PhotoFrame.reemplazar.isSelected()) {
 
 							++paso;
 
@@ -378,29 +375,26 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 				--y;
 
+				verImagenes();
+
 				PhotoFrame.photoPanel.setBackground(Color.WHITE);
 
 				PhotoFrame.photoPanel.setForeground(Color.WHITE);
 
 				PhotoFrame.getjPanel1().add(PhotoFrame.photoPanel);
 
-				if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected() && y > 0) {
+				if (PhotoFrame.rdbtnmntmNewRadioItem_2.isSelected()) {
 
 					paso = 0;
 
 					int numerOpcion = 0;
 
-					listaImagenes.clear();
+					PhotoFrame.verFoto(listaImagenes.size() - 1);
 
-					listaImagenes = Metodos.directorio(PhotoFrame.carpetaRecortes + Main.getSeparador(), ".", true,
-							true);
-
-					String[] options = { "<html><h2>[1] Subir al CMS</h2></html>",
-							"<html><h2>[2] Mover a la carpeta imagenes</h2></html>",
-							"<html><h2>[3] Hacer GIF</h2></html>",
-							"<html><h2>[4] Abrir imagenes para recortar</h2></html>",
-							"<html><h2>[5] Abrir carpeta de salida</h2></html>",
-							"<html><h2>[6] Borrar imagenes para recortar</h2></html>" };
+					String[] options = { "<html><h2>[1] Abrir carpeta de salida</h2></html>",
+							"<html><h2>[2] Abrir imagenes para recortar</h2></html>",
+							"<html><h2>[3] Abrir imagenes rotadas</h2></html>",
+							"<html><h2>[4] Borrar imagenes para recortar</h2></html>" };
 
 					ImageIcon icon = new ImageIcon(Main.class.getResource("/imagenes/utilities.png"));
 
@@ -414,14 +408,18 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 					switch (numerOpcion) {
 
 					case 1:
-						Metodos.abrirCarpeta(PhotoFrame.directorio);
-						break;
-
-					case 2:
 						Metodos.abrirCarpeta(PhotoFrame.carpetaRecortes);
 						break;
 
+					case 2:
+						Metodos.abrirCarpeta(PhotoFrame.directorio);
+						break;
+
 					case 3:
+						Metodos.abrirCarpeta(PhotoFrame.carpetaRecortes + Main.getSeparador() + "Image_rotate");
+						break;
+
+					case 4:
 						Metodos.eliminarArchivos(PhotoFrame.directorio + Main.getSeparador());
 						break;
 
@@ -430,11 +428,22 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 				}
 
 			}
+
 		}
 
 		catch (Exception e) {
 
 		}
+
+	}
+
+	private void verImagenes() {
+
+		listaImagenes.clear();
+
+		listaImagenes = Metodos.directorio(PhotoFrame.directorio + Main.getSeparador(), ".", true, false);
+
+		listaImagenes.sort(String::compareToIgnoreCase);
 
 	}
 
@@ -484,12 +493,16 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 
 		y2 = (int) e.getPoint().getY();
 
-		if (x2 < 0)
+		if (x2 < 0) {
 			x2 = 0;
-		if (y2 < 0)
+		}
+
+		if (y2 < 0) {
 			y2 = 0;
+		}
 
 		dx1x2 = x2 - x1;
+
 		dy1y2 = y2 - y1;
 
 		if (x1 + dx1x2 > getWidth())
@@ -510,8 +523,11 @@ public class PhotoPanel extends JPanel implements MouseMotionListener, MouseList
 	public void mousePressed(MouseEvent e) {
 
 		if (e.getButton() == MouseEvent.BUTTON1) {
+
 			x1 = (int) e.getPoint().getX();
+
 			y1 = (int) e.getPoint().getY();
+
 		}
 
 		showPopup(e);
