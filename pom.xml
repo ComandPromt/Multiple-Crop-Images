@@ -1,28 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
-  <groupId>Recortador-de-imagenes-multiple</groupId>
-  <artifactId>Recortador-de-imagenes-multiple</artifactId>
+  <groupId>Multiple-Image-Editor</groupId>
+  <artifactId>Multiple-Image-Editor</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-
-  <name>Recortador-de-imagenes-multiple</name>
-  <url>http://maven.apache.org</url>
-
-<properties>
+	<properties>
+		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		
 		<maven.compiler.source>1.8</maven.compiler.source>
+		
 		<maven.compiler.target>1.8</maven.compiler.target>
+	
 	</properties>
-
-  <dependencies>
-   
-    <dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>20180813</version>
-		</dependency>
-   
-  </dependencies>
 </project>
