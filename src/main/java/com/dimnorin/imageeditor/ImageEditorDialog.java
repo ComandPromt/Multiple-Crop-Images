@@ -249,6 +249,7 @@ public class ImageEditorDialog extends JFrame {
 			ponerImagen(lista.get(indice));
 
 		}
+
 	}
 
 	private void atras() {
@@ -281,8 +282,6 @@ public class ImageEditorDialog extends JFrame {
 
 		image = new ImageIcon(f).getImage();
 
-		imgPanel.setImg(image);
-
 		int hue = slHue.getValue();
 
 		int con = slContrast.getValue();
@@ -290,6 +289,8 @@ public class ImageEditorDialog extends JFrame {
 		int sar = slSaturation.getValue();
 
 		int br = slBrightness.getValue();
+
+		imgPanel.setImg(image);
 
 		if (rotar) {
 
@@ -313,11 +314,13 @@ public class ImageEditorDialog extends JFrame {
 
 		}
 
-		else {
+		slHue.setValue(0);
 
-			imageAdjuster = new ImageAdjuster(imgPanel);
+		slContrast.setValue(0);
 
-		}
+		slSaturation.setValue(0);
+
+		slBrightness.setValue(0);
 
 		slHue.setValue(hue);
 
@@ -348,6 +351,12 @@ public class ImageEditorDialog extends JFrame {
 		slSaturation.setValue(SATURATION_MULT * ImageAdjuster.DEF_SATURATION);
 
 		imageAdjuster.resetImage();
+
+		if (!lista.isEmpty()) {
+
+			ponerImagen(lista.get(indice));
+
+		}
 
 	}
 
@@ -679,8 +688,7 @@ public class ImageEditorDialog extends JFrame {
 
 		adjPanel.add(lblNewLabel, "cell 6 3");
 
-		SimpleButton btnNewButton_10 = new SimpleButton("0º");
-		btnNewButton_10.setText("Reset Position");
+		SimpleButton btnNewButton_10 = new SimpleButton("Reset Position");
 
 		btnNewButton_10.setIcon(new ImageIcon(ImageEditorDialog.class.getResource("/images/objetive.png")));
 
